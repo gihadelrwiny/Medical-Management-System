@@ -11,4 +11,10 @@
     <ProjectReference Include="..\Clinical.Domain\Clinical.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Repositories\" />
+    <Folder Include="Services\" />
+    <Folder Include="Persistence\" />
+  </ItemGroup>
+
 </Project>

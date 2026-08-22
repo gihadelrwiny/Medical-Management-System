@@ -15,4 +15,9 @@
     <ProjectReference Include="..\Clinical.Infrastructure\Clinical.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Middlewares\" />
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+
 </Project>
