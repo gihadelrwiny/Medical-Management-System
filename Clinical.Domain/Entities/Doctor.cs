@@ -1,12 +1,14 @@
-﻿using System;
+﻿using Clinical.Domain.Common.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Clinical.Domain.Entities
 {
-    public class Doctor
+    public class Doctor : IEntity
     {
         public int Id { get; set; }
 

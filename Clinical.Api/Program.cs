@@ -1,4 +1,7 @@
+using Clinical.Application.Interfaces;
 using Clinical.Infrastructure.Persistence;
+using Clinical.Infrastructure.Repositories;
+using Clinical.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +15,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ClinicalDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 
 var app = builder.Build();
 

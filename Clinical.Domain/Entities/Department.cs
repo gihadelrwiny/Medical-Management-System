@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Clinical.Domain.Common.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Clinical.Domain.Entities
 {
-    public class Department
+    public class Department : IEntity
     {
         public int Id { get; set; }
 
@@ -19,5 +20,6 @@ namespace Clinical.Domain.Entities
 
         public ICollection<Doctor> Doctors { get; set; }
             = new List<Doctor>();
+     
     }
 }

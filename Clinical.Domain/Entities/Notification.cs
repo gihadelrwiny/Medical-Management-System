@@ -1,4 +1,5 @@
-﻿using Clinical.Domain.Enums;
+﻿using Clinical.Domain.Common.Interfaces;
+using Clinical.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Clinical.Domain.Entities
 {
-    public class Notification
+    public class Notification : IEntity
     {
         public int Id { get; set; }
 
