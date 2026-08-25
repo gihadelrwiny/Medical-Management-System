@@ -10,8 +10,4 @@
     <ProjectReference Include="..\Clinical.Domain\Clinical.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Common\" />
-  </ItemGroup>
-
 </Project>

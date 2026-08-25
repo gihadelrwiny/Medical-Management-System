@@ -16,6 +16,7 @@ namespace Clinical.Infrastructure.Persistence
             : base(options)
         {
         }
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         public DbSet<User> Users => Set<User>();
         public DbSet<Patient> Patients => Set<Patient>();

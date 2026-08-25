@@ -21,5 +21,7 @@ namespace Clinical.Domain.Entities
         public string PasswordHash { get; set; } = string.Empty;
 
         public UserRole Role { get; set; }
+        public ICollection<RefreshToken> RefreshTokens { get; set; }
+    = new List<RefreshToken>();
     }
 }
