@@ -1,4 +1,5 @@
 ﻿using Clinical.Application.DTOs.Department;
+using Clinical.Application.DTOs.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Clinical.Application.Interfaces
 {
     public interface IDepartmentService
     {
-        Task<IEnumerable<DepartmentDto>> GetAllAsync(CancellationToken cancellationToken = default);
+         Task<PagedResult<DepartmentDto>> GetAllAsync(QueryParams query,CancellationToken cancellationToken = default);
         Task<DepartmentDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
         Task<DepartmentDto> CreateAsync(CreateDepartmentDto dto, CancellationToken cancellationToken = default);
         Task<bool> UpdateAsync(int id, UpdateDepartmentDto dto, CancellationToken cancellationToken = default);

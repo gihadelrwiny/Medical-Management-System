@@ -1,98 +1,143 @@
-﻿using Clinical.Application.DTOs.Department;
+﻿using AutoMapper;
+using Clinical.Application.DTOs.Department;
+using Clinical.Application.DTOs.Pagination;
 using Clinical.Application.Interfaces;
 using Clinical.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Clinical.Infrastructure.Services
+namespace Clinical.Infrastructure.Services;
+
+public class DepartmentService : IDepartmentService
 {
-    public class DepartmentService:IDepartmentService
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+
+    public DepartmentService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper)
     {
-        private readonly IUnitOfWork _unitOfWork;
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+    }
 
-        public DepartmentService(IUnitOfWork unitOfWork)
+    public async Task<PagedResult<DepartmentDto>> GetAllAsync(
+        QueryParams query,
+        CancellationToken cancellationToken = default)
+    {
+        Expression<Func<Department, bool>>? filter = null;
+
+        // Search
+        if (!string.IsNullOrWhiteSpace(query.Search))
         {
-            _unitOfWork = unitOfWork;
+            var search = query.Search.Trim();
+
+            filter = d =>
+                d.Name.Contains(search) ||
+                d.Description.Contains(search);
         }
 
-        public async Task<IEnumerable<DepartmentDto>> GetAllAsync(CancellationToken cancellationToken = default)
-        {
-            var includes = new Expression<Func<Department, object>>[] { d => d.Doctors };
-            var departments = await _unitOfWork.Departments.GetAllAsync(includes, cancellationToken);
-
-            return departments.Select(d => new DepartmentDto
+        // Sorting
+        Func<IQueryable<Department>, IQueryable<Department>> orderBy =
+            query.SortBy.ToLower() switch
             {
-                Id = d.Id,
-                Name = d.Name,
-                Description = d.Description,
-                DoctorCount = d.Doctors.Count
-            });
-        }
+                "name" => query.SortDir.ToLower() == "desc"
+                    ? q => q.OrderByDescending(d => d.Name)
+                    : q => q.OrderBy(d => d.Name),
 
-        public async Task<DepartmentDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-        {
-            var includes = new Expression<Func<Department, object>>[] { d => d.Doctors };
-            var department = await _unitOfWork.Departments.GetByIdAsync(id, includes, cancellationToken);
+                "description" => query.SortDir.ToLower() == "desc"
+                    ? q => q.OrderByDescending(d => d.Description)
+                    : q => q.OrderBy(d => d.Description),
 
-            if (department is null) return null;
-
-            return new DepartmentDto
-            {
-                Id = department.Id,
-                Name = department.Name,
-                Description = department.Description,
-                DoctorCount = department.Doctors.Count
-            };
-        }
-
-        public async Task<DepartmentDto> CreateAsync(CreateDepartmentDto dto, CancellationToken cancellationToken = default)
-        {
-            var department = new Department
-            {
-                Name = dto.Name,
-                Description = dto.Description
+                _ => query.SortDir.ToLower() == "desc"
+                    ? q => q.OrderByDescending(d => d.Id)
+                    : q => q.OrderBy(d => d.Id)
             };
 
-            await _unitOfWork.Departments.AddAsync(department, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            return new DepartmentDto
-            {
-                Id = department.Id,
-                Name = department.Name,
-                Description = department.Description,
-                DoctorCount = 0
-            };
-        }
-
-        public async Task<bool> UpdateAsync(int id, UpdateDepartmentDto dto, CancellationToken cancellationToken = default)
+        var includes = new Expression<Func<Department, object>>[]
         {
-            var department = await _unitOfWork.Departments.GetByIdAsync(id, null, cancellationToken);
-            if (department is null) return false;
+            d => d.Doctors
+        };
 
-            department.Name = dto.Name;
-            department.Description = dto.Description;
+        var result = await _unitOfWork.Departments.GetPagedAsync(
+            query.PageNumber,
+            query.PageSize,
+            filter,
+            orderBy,
+            includes,
+            cancellationToken);
 
-            _unitOfWork.Departments.Update(department);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            return true;
-        }
-
-        public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
+        return new PagedResult<DepartmentDto>
         {
-            var department = await _unitOfWork.Departments.GetByIdAsync(id, null, cancellationToken);
-            if (department is null) return false;
+            Items = _mapper.Map<List<DepartmentDto>>(result.Items),
+            TotalCount = result.TotalCount,
+            PageNumber = result.PageNumber,
+            PageSize = result.PageSize
+        };
+    }
 
-            _unitOfWork.Departments.Delete(department);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+    public async Task<DepartmentDto?> GetByIdAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var includes = new Expression<Func<Department, object>>[]
+        {
+            d => d.Doctors
+        };
 
-            return true;
-        }
+        var department = await _unitOfWork.Departments
+            .GetByIdAsync(id, includes, cancellationToken);
+
+        return _mapper.Map<DepartmentDto>(department);
+    }
+
+    public async Task<DepartmentDto> CreateAsync(
+        CreateDepartmentDto dto,
+        CancellationToken cancellationToken = default)
+    {
+        var department = _mapper.Map<Department>(dto);
+
+        await _unitOfWork.Departments
+            .AddAsync(department, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return _mapper.Map<DepartmentDto>(department);
+    }
+
+    public async Task<bool> UpdateAsync(
+        int id,
+        UpdateDepartmentDto dto,
+        CancellationToken cancellationToken = default)
+    {
+        var department = await _unitOfWork.Departments
+            .GetByIdAsync(id, null, cancellationToken);
+
+        if (department is null)
+            return false;
+
+        _mapper.Map(dto, department);
+
+        _unitOfWork.Departments.Update(department);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return true;
+    }
+
+    public async Task<bool> DeleteAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var department = await _unitOfWork.Departments
+            .GetByIdAsync(id, null, cancellationToken);
+
+        if (department is null)
+            return false;
+
+        _unitOfWork.Departments.Delete(department);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return true;
     }
 }
-

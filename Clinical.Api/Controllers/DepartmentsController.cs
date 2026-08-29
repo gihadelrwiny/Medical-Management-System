@@ -1,4 +1,5 @@
 ﻿using Clinical.Application.DTOs.Department;
+using Clinical.Application.DTOs.Pagination;
 using Clinical.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,11 +31,13 @@ namespace Clinical.API.Controllers
         /// <returns>A list of departments.</returns>
         /// <response code="200">Returns the list of departments.</response>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<DepartmentDto>))]
-        public async Task<ActionResult<IEnumerable<DepartmentDto>>> GetAll(CancellationToken cancellationToken)
+        public async Task<ActionResult<PagedResult<DepartmentDto>>> GetAll(
+        [FromQuery] QueryParams query,
+        CancellationToken ct)
         {
-            var departments = await _departmentService.GetAllAsync(cancellationToken);
-            return Ok(departments);
+            var result = await _departmentService.GetAllAsync(query, ct);
+
+            return Ok(result);
         }
 
         /// <summary>

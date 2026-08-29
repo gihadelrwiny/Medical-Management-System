@@ -20,7 +20,7 @@ namespace Clinical.Infrastructure.Repositories
         // in a typical scoped DI lifetime).
         private IRepository<User>? _users;
         private IRepository<Patient>? _patients;
-        private IRepository<Doctor>? _doctors;
+        private IDoctorRepository? _doctors;
         private IRepository<Department>? _departments;
         private IRepository<DoctorSchedule>? _doctorSchedules;
         private IRepository<Appointment>? _appointments;
@@ -29,6 +29,7 @@ namespace Clinical.Infrastructure.Repositories
         private IRepository<Medication>? _medications;
         private IRepository<Payment>? _payments;
         private IRepository<Notification>? _notifications;
+        private IRepository<RefreshToken>? _refreshTokens;
 
         public UnitOfWork(ClinicalDbContext context)
         {
@@ -41,8 +42,8 @@ namespace Clinical.Infrastructure.Repositories
         public IRepository<Patient> Patients =>
             _patients ??= new Repository<Patient>(_context);
 
-        public IRepository<Doctor> Doctors =>
-            _doctors ??= new Repository<Doctor>(_context);
+        public IDoctorRepository Doctors =>
+      _doctors ??= new DoctorRepository(_context);
 
         public IRepository<Department> Departments =>
             _departments ??= new Repository<Department>(_context);
@@ -67,6 +68,8 @@ namespace Clinical.Infrastructure.Repositories
 
         public IRepository<Notification> Notifications =>
             _notifications ??= new Repository<Notification>(_context);
+        public IRepository<RefreshToken> RefreshTokens =>
+      _refreshTokens ??= new Repository<RefreshToken>(_context);
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

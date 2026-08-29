@@ -11,7 +11,7 @@ namespace Clinical.Application.Interfaces
     {
         IRepository<User> Users { get; }
         IRepository<Patient> Patients { get; }
-        IRepository<Doctor> Doctors { get; }
+        IDoctorRepository? Doctors { get; }
         IRepository<Department> Departments { get; }
         IRepository<DoctorSchedule> DoctorSchedules { get; }
         IRepository<Appointment> Appointments { get; }
@@ -21,6 +21,7 @@ namespace Clinical.Application.Interfaces
         IRepository<Payment> Payments { get; }
         IRepository<Notification> Notifications { get; }
 
+        IRepository<RefreshToken> RefreshTokens { get; }
         /// <summary>
         /// Persists all pending changes across every repository used in
         /// this unit of work, in a single DbContext SaveChanges call

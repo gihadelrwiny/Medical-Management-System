@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Clinical.Application.DTOs.Pagination;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -10,6 +11,14 @@ namespace Clinical.Application.Interfaces
 
     public interface IRepository<T> where T : class
     {
+        Task<PagedResult<T>> GetPagedAsync(
+         int pageNumber,
+         int pageSize,
+         Expression<Func<T, bool>>? filter = null,
+         Func<IQueryable<T>, IQueryable<T>>? orderBy = null,
+         Expression<Func<T, object>>[]? includes = null,
+         CancellationToken cancellationToken = default);
+
         Task<IEnumerable<T>> GetAllAsync(
          Expression<Func<T, object>>[]? includes = null,
          CancellationToken cancellationToken = default);

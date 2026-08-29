@@ -3,9 +3,12 @@
 namespace Clinical.Api.Contracts
 {
     public sealed record RegisterRequest(
-     [Required, MaxLength(100)] string FullName,
-     [Required, EmailAddress] string Email,
-     [Required, MinLength(8)] string Password);
+    [Required, MaxLength(100)] string FullName,
+    [Required, EmailAddress] string Email,
+    [Required, MinLength(8)] string Password,
+    [Required] DateTime DateOfBirth,
+    [Required, MaxLength(500)] string Address
+);
 
     public sealed record LoginRequest(
         [Required, EmailAddress] string Email,
