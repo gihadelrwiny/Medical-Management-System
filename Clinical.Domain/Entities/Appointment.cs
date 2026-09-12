@@ -22,6 +22,9 @@ namespace Clinical.Domain.Entities
 
         public AppointmentStatus Status { get; set; }
             = AppointmentStatus.Pending;
+        public bool IsDeleted { get; set; } = false;
+
+        public DateTime? DeletedAt { get; set; }
 
 
         // Navigation Properties

@@ -16,6 +16,9 @@ namespace Clinical.Domain.Entities
         public DateTime ExpiresOnUtc { get; set; }
 
         public DateTime? RevokedOnUtc { get; set; }
+        public bool IsDeleted { get; set; } = false;
+
+        public DateTime? DeletedAt { get; set; }
 
         public int UserId { get; set; }
 

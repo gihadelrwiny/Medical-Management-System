@@ -18,6 +18,10 @@ namespace Clinical.Domain.Entities
 
         public string PhoneNumber { get; set; } = string.Empty;
 
+        public bool IsDeleted { get; set; } = false;
+
+        public DateTime? DeletedAt { get; set; }
+
         public User User { get; set; } = null!;
 
         public Department Department { get; set; } = null!;

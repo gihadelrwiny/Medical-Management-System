@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Clinical.Application.DTOs.Appoinment;
 using Clinical.Application.DTOs.Department;
 using Clinical.Application.DTOs.Doctor;
+using Clinical.Application.DTOs.Patients;
 using Clinical.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -23,7 +25,7 @@ namespace Clinical.Application.Mapping
             CreateMap<UpdateDoctorDto, Doctor>();
 
             //Department mappings
-            // Department
+           
             CreateMap<Department, DepartmentDto>()
                 .ForMember(
                     dest => dest.DoctorCount,
@@ -33,6 +35,22 @@ namespace Clinical.Application.Mapping
 
             CreateMap<UpdateDepartmentDto, Department>();
 
+            //Patient mappings
+           
+            CreateMap<UpdatePatientDto, Patient>();
+
+            CreateMap<Patient, PatientDto>();
+            //appoinment mappings
+            CreateMap<Appointment, AppointmentDto>()
+              .ForMember(dest => dest.PatientName,
+                  opt => opt.MapFrom(src => src.Patient.User.FirstName + " " + src.Patient.User.LastName))
+              .ForMember(dest => dest.DoctorName,
+                  opt => opt.MapFrom(src => src.Doctor.User.FirstName + " " + src.Doctor.User.LastName));
+
+            CreateMap<CreateAppointmentDto, Appointment>();
+
+            // Only overwrite fields the client is allowed to change
+            CreateMap<UpdateAppointmentDto, Appointment>();
 
         }
     }

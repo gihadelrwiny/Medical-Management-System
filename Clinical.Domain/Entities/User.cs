@@ -19,6 +19,9 @@ namespace Clinical.Domain.Entities
         public string Email { get; set; } = string.Empty;
 
         public string PasswordHash { get; set; } = string.Empty;
+        public bool IsDeleted { get; set; } = false;
+
+        public DateTime? DeletedAt { get; set; }
 
         public UserRole Role { get; set; }
         public ICollection<RefreshToken> RefreshTokens { get; set; }

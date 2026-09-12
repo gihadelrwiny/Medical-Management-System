@@ -10,7 +10,7 @@ public interface IDoctorService
     Task<PagedResult<DoctorDto>> GetAllAsync(
     QueryParams query,
     CancellationToken ct);
-    Task<IEnumerable<DoctorDto>> GetAllAsync(CancellationToken ct);
+    
 
     Task<DoctorDto?> GetByIdAsync(
         int id,

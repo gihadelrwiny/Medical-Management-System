@@ -13,7 +13,7 @@ namespace Clinical.Infrastructure.Services;
 public class DoctorService(
     IUnitOfWork unitOfWork,
     IMapper mapper,
-    IPasswordHasher<User> passwordHasher) : IDoctorService   // <-- injected here
+    IPasswordHasher<User> passwordHasher) : IDoctorService   
 {
     public async Task<PagedResult<DoctorDto>> GetAllAsync(
         QueryParams query,
@@ -72,14 +72,6 @@ public class DoctorService(
         };
     }
 
-    public async Task<IEnumerable<DoctorDto>> GetAllAsync(
-        CancellationToken ct)
-    {
-        var doctors = await unitOfWork.Doctors
-            .GetAllAsync(cancellationToken: ct);
-
-        return mapper.Map<IEnumerable<DoctorDto>>(doctors);
-    }
 
     public async Task<DoctorDto?> GetByIdAsync(
         int id,
@@ -194,17 +186,42 @@ public class DoctorService(
     }
 
     public async Task DeleteAsync(
-        int id,
-        CancellationToken ct)
+     int id,
+     CancellationToken ct)
     {
         var doctor = await unitOfWork.Doctors
-            .GetByIdAsync(id, cancellationToken: ct);
+            .GetByIdAsync(
+                id,
+                new Expression<Func<Doctor, object>>[]
+                {
+                d => d.User
+                },
+                ct);
 
         if (doctor is null)
             throw new KeyNotFoundException("Doctor not found.");
 
-        unitOfWork.Doctors.Delete(doctor);
+        try
+        {
+            await unitOfWork.BeginTransactionAsync(ct);
 
-        await unitOfWork.SaveChangesAsync(ct);
+            // Delete Doctor first
+            unitOfWork.Doctors.Delete(doctor);
+
+            // Delete related User
+            if (doctor.User is not null)
+            {
+                unitOfWork.Users.Delete(doctor.User);
+            }
+
+            await unitOfWork.SaveChangesAsync(ct);
+
+            await unitOfWork.CommitTransactionAsync(ct);
+        }
+        catch
+        {
+            await unitOfWork.RollbackTransactionAsync(ct);
+            throw;
+        }
     }
 }

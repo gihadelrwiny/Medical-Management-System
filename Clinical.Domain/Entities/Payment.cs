@@ -27,6 +27,10 @@ namespace Clinical.Domain.Entities
 
         public DateTime? PaidAt { get; set; }
 
+        public bool IsDeleted { get; set; } = false;
+
+        public DateTime? DeletedAt { get; set; }
+
 
         // Navigation Properties
 

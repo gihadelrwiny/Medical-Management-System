@@ -20,6 +20,9 @@ namespace Clinical.Domain.Entities
         public TimeSpan EndTime { get; set; }
 
         public bool IsAvailable { get; set; } = true;
+        public bool IsDeleted { get; set; } = false;
+
+        public DateTime? DeletedAt { get; set; }
 
 
         // Navigation Property

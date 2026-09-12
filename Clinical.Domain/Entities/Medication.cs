@@ -22,6 +22,9 @@ namespace Clinical.Domain.Entities
         public string? Duration { get; set; }
 
         public string? Instructions { get; set; }
+        public bool IsDeleted { get; set; } = false;
+
+        public DateTime? DeletedAt { get; set; }
 
 
         // Navigation Property
