@@ -15,5 +15,6 @@ namespace Clinical.Application.Interfaces
         Task<AppointmentDto> CreateAsync(CreateAppointmentDto dto, CancellationToken cancellationToken = default);
         Task<bool> UpdateAsync(int id, UpdateAppointmentDto dto, CancellationToken cancellationToken = default);
         Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
+     
     }
 }

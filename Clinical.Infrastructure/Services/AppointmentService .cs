@@ -102,9 +102,11 @@ namespace Clinical.Infrastructure.Services
         }
 
         public async Task<AppointmentDto> CreateAsync(
-            CreateAppointmentDto dto,
-            CancellationToken cancellationToken = default)
+     CreateAppointmentDto dto,
+     CancellationToken cancellationToken = default)
         {
+            await EnsureWithinDoctorScheduleAsync(dto.DoctorId, dto.AppointmentDate, cancellationToken);
+
             var hasConflict = await _unitOfWork.Appointments.HasConflictAsync(
                 dto.DoctorId, dto.AppointmentDate, cancellationToken: cancellationToken);
 
@@ -114,24 +116,23 @@ namespace Clinical.Infrastructure.Services
             var appointment = _mapper.Map<Appointment>(dto);
             appointment.Status = AppointmentStatus.Pending;
 
-            await _unitOfWork.Appointments
-                .AddAsync(appointment, cancellationToken);
-
+            await _unitOfWork.Appointments.AddAsync(appointment, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return _mapper.Map<AppointmentDto>(appointment);
         }
-
         public async Task<bool> UpdateAsync(
-            int id,
-            UpdateAppointmentDto dto,
-            CancellationToken cancellationToken = default)
+           int id,
+           UpdateAppointmentDto dto,
+           CancellationToken cancellationToken = default)
         {
             var appointment = await _unitOfWork.Appointments
                 .GetByIdAsync(id, null, cancellationToken);
 
             if (appointment is null)
                 return false;
+
+            await EnsureWithinDoctorScheduleAsync(appointment.DoctorId, dto.AppointmentDate, cancellationToken);
 
             var hasConflict = await _unitOfWork.Appointments.HasConflictAsync(
                 appointment.DoctorId, dto.AppointmentDate, excludeAppointmentId: id, cancellationToken: cancellationToken);
@@ -140,9 +141,7 @@ namespace Clinical.Infrastructure.Services
                 throw new InvalidOperationException("This doctor already has an appointment at that time.");
 
             _mapper.Map(dto, appointment);
-
             _unitOfWork.Appointments.Update(appointment);
-
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return true;
@@ -164,5 +163,35 @@ namespace Clinical.Infrastructure.Services
 
             return true;
         }
+
+        private async Task EnsureWithinDoctorScheduleAsync(
+    int doctorId,
+    DateTime appointmentDate,
+    CancellationToken cancellationToken)
+        {
+            var schedules = await _unitOfWork.DoctorSchedules.GetByDoctorAndDayAsync(
+                doctorId, appointmentDate.DayOfWeek, cancellationToken);
+
+            if (schedules is null || !schedules.Any())
+                throw new InvalidOperationException(
+                    $"Doctor is not available on {appointmentDate.DayOfWeek}.");
+
+            var appointmentTime = appointmentDate.TimeOfDay;
+
+            var isWithinAnySchedule = schedules.Any(s =>
+                appointmentTime >= s.StartTime && appointmentTime <= s.EndTime);
+
+            if (!isWithinAnySchedule)
+            {
+                var ranges = string.Join(", ", schedules
+                    .OrderBy(s => s.StartTime)
+                    .Select(s => $"{s.StartTime}-{s.EndTime}"));
+
+                throw new InvalidOperationException(
+                    $"Appointment time must fall within one of the doctor's available time ranges on {appointmentDate.DayOfWeek}: {ranges}.");
+            }
+        }
+
+     
     }
-    }
+}
