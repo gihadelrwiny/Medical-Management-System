@@ -13,7 +13,7 @@ namespace Clinical.Application.Interfaces
         IRepository<Patient> Patients { get; }
         IDoctorRepository? Doctors { get; }
         IRepository<Department> Departments { get; }
-        IRepository<DoctorSchedule> DoctorSchedules { get; }
+        IDoctorScheduleRepository DoctorSchedules { get; }
         IAppointmentRepository Appointments { get; }
         IRepository<MedicalRecord> MedicalRecords { get; }
         IRepository<Prescription> Prescriptions { get; }

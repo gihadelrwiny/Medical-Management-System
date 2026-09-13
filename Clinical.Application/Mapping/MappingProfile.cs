@@ -2,6 +2,7 @@
 using Clinical.Application.DTOs.Appoinment;
 using Clinical.Application.DTOs.Department;
 using Clinical.Application.DTOs.Doctor;
+using Clinical.Application.DTOs.DoctorSchedule;
 using Clinical.Application.DTOs.Patients;
 using Clinical.Domain.Entities;
 using System;
@@ -51,6 +52,15 @@ namespace Clinical.Application.Mapping
 
             // Only overwrite fields the client is allowed to change
             CreateMap<UpdateAppointmentDto, Appointment>();
+
+            //DoctorSchedule mappings
+            CreateMap<DoctorSchedule, DoctorScheduleDto>()
+                .ForMember(dest => dest.DoctorName,
+                    opt => opt.MapFrom(src => src.Doctor.User.FirstName + " " + src.Doctor.User.LastName));
+
+            CreateMap<CreateDoctorScheduleDto, DoctorSchedule>();
+
+            CreateMap<UpdateDoctorScheduleDto, DoctorSchedule>();
 
         }
     }
