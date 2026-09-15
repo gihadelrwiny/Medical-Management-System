@@ -35,10 +35,6 @@ namespace Clinical.Infrastructure.Persistence.Configuration
             builder.HasIndex(m => m.AppointmentId)
                 .IsUnique();
 
-            // Medical records must never be cascade-deleted from either
-            // side; deleting a patient, doctor, or appointment should be
-            // blocked (or handled via soft-delete/archival) rather than
-            // silently destroying clinical history.
             builder.HasOne(m => m.Patient)
                 .WithMany()
                 .HasForeignKey(m => m.PatientId)
@@ -49,9 +45,11 @@ namespace Clinical.Infrastructure.Persistence.Configuration
                 .HasForeignKey(m => m.DoctorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Appointment <-> MedicalRecord FK/uniqueness is declared here
-            // as the dependent side; navigation is also configured in
-            // AppointmentConfiguration for clarity on both ends.
+            // One medical record has one prescription
+            builder.HasOne(m => m.Prescription)
+                .WithOne(p => p.MedicalRecord)
+                .HasForeignKey<Prescription>(p => p.MedicalRecordId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

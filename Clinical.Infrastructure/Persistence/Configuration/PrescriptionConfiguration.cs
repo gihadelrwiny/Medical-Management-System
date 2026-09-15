@@ -32,11 +32,9 @@ namespace Clinical.Infrastructure.Persistence.Configuration
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(p => p.MedicalRecord)
-                .WithMany(m => m.Prescriptions)
-                .HasForeignKey(p => p.MedicalRecordId)
-                // A medical record can have multiple prescriptions;
-                // deleting the record is still blocked at the record level.
-                .OnDelete(DeleteBehavior.Restrict);
+           .WithOne(m => m.Prescription)
+         .HasForeignKey<Prescription>(p => p.MedicalRecordId)
+          .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

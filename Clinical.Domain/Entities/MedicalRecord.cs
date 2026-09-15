@@ -38,7 +38,6 @@ namespace Clinical.Domain.Entities
 
         public Appointment Appointment { get; set; } = null!;
 
-        public ICollection<Prescription> Prescriptions { get; set; }
-            = new List<Prescription>();
+        public Prescription Prescription { get; set; } = null!;
     }
 }

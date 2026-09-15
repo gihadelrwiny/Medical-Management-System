@@ -24,7 +24,7 @@ namespace Clinical.Infrastructure.Repositories
         private IRepository<Department>? _departments;
         private IDoctorScheduleRepository _doctorSchedules;
         private IAppointmentRepository? _appointments;
-        private IRepository<MedicalRecord>? _medicalRecords;
+        private IMedicalRecordRepository? _medicalRecords;
         private IRepository<Prescription>? _prescriptions;
         private IRepository<Medication>? _medications;
         private IRepository<Payment>? _payments;
@@ -55,8 +55,8 @@ namespace Clinical.Infrastructure.Repositories
         public IAppointmentRepository Appointments =>
             _appointments ??= new AppointmentRepository(_context);
 
-        public IRepository<MedicalRecord> MedicalRecords =>
-            _medicalRecords ??= new Repository<MedicalRecord>(_context);
+        public IMedicalRecordRepository MedicalRecords =>
+            _medicalRecords ??= new MedicalRecordRepository (_context);
 
         public IRepository<Prescription> Prescriptions =>
             _prescriptions ??= new Repository<Prescription>(_context);

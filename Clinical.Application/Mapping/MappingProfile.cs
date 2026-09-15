@@ -3,6 +3,7 @@ using Clinical.Application.DTOs.Appoinment;
 using Clinical.Application.DTOs.Department;
 using Clinical.Application.DTOs.Doctor;
 using Clinical.Application.DTOs.DoctorSchedule;
+using Clinical.Application.DTOs.MedicalRecord;
 using Clinical.Application.DTOs.Patients;
 using Clinical.Domain.Entities;
 using System;
@@ -61,6 +62,12 @@ namespace Clinical.Application.Mapping
             CreateMap<CreateDoctorScheduleDto, DoctorSchedule>();
 
             CreateMap<UpdateDoctorScheduleDto, DoctorSchedule>();
+            //medical record mappings
+            CreateMap<MedicalRecord, MedicalRecordDto>();
+
+            CreateMap<CreateMedicalRecordRequest, MedicalRecord>();
+
+            CreateMap<UpdateMedicalRecordDto, MedicalRecord>();
 
         }
     }
